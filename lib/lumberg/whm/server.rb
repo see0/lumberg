@@ -42,6 +42,8 @@ module Lumberg
       # HTTP read/open timeout
       attr_accessor :timeout
 
+      attr_accessor :port
+
       #
       # ==== Required
       #  * <tt>:host</tt> - PENDING
@@ -59,6 +61,12 @@ module Lumberg
         @user       = (options.has_key?(:user) ? options.delete(:user) : 'root')
         @basic_auth = options.delete(:basic_auth)
         @timeout    = options.delete(:timeout)
+        @port       = options.delete(:port)
+
+        unless options(:password).nil?
+          @basic_auth = 1
+          @hash       = options.delete(:password)
+        end
 
         validate_server_host
 
@@ -201,7 +209,7 @@ module Lumberg
 
       def format_url(options = {})
         @ssl = true if @ssl.nil?
-        port  = (@ssl ? 2087 : 2086)
+        port  = @port || (@ssl ? 2087 : 2086)
         proto = (@ssl ? 'https' : 'http')
 
         "#{proto}://#{@host}:#{port}/json-api/"
